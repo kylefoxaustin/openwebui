@@ -1,0 +1,78 @@
+FROM golang:1.24-bullseye as builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Clone Ollama repository
+WORKDIR /go/src
+RUN git clone https://github.com/ollama/ollama.git
+
+# Check the directory structure
+WORKDIR /go/src/ollama
+RUN ls -la && \
+    find . -name "main.go" -type f
+
+# Build Ollama with CPU-only flags (adjusted path)
+RUN go mod download && \
+    CGO_ENABLED=1 GOARCH=amd64 go build -o ollama .
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install minimal dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    libmagic1 \
+    supervisor \
+    bash \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the Ollama binary from builder
+COPY --from=builder /go/src/ollama/ollama /usr/local/bin/ollama
+RUN chmod +x /usr/local/bin/ollama
+
+# Copy pre-built files
+COPY ./build /app/build
+COPY ./backend /app/backend
+COPY ./CHANGELOG.md /app/
+COPY ./package.json /app/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
+    pip install --no-cache-dir uvicorn
+
+# Create data directories
+RUN mkdir -p /app/backend/data && chmod -R 777 /app/backend/data && \
+    mkdir -p /root/.ollama && chmod -R 777 /root/.ollama
+
+# Set environment variable to force CPU usage
+ENV OLLAMA_HOST="0.0.0.0"
+ENV PORT=8080
+ENV HOST=0.0.0.0
+ENV OLLAMA_BASE_URL="http://localhost:11434"
+
+# Set up supervisor configuration
+RUN echo '[supervisord]\n\
+nodaemon=true\n\
+\n\
+[program:ollama]\n\
+command=/usr/local/bin/ollama serve\n\
+environment=CUDA_VISIBLE_DEVICES="",OLLAMA_HOST="0.0.0.0"\n\
+\n\
+[program:openwebui]\n\
+command=bash -c "cd /app/backend && python -m uvicorn open_webui.main:app --host 0.0.0.0 --port 8080"\n\
+' > /etc/supervisor/conf.d/supervisord.conf
+
+# Expose ports
+EXPOSE 8080 11434
+
+# Create volumes
+VOLUME /root/.ollama
+VOLUME /app/backend/data
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
