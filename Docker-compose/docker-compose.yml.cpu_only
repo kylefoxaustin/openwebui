@@ -3,8 +3,8 @@ services:
   owui:
     build:
       context: .
-      dockerfile: Dockerfile.cpu-only-amd64
-    image: kylefoxaustin/owui_llm_rag_ready:cpu-only-amd64  # Custom image name
+      dockerfile: Dockerfile.cpu_only
+    image: kylefoxaustin/owui_llm_rag_ready:cpu_only # Custom image name
     container_name: owui-cpu-only  # This sets the container name
     ports:
       - "8080:8080"
