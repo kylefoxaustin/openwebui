@@ -1,6 +1,7 @@
 Welcome to the OpenWebUI Container!
 
 **The purpose of this container is simple: Provide a full featured OWUI container with full internet access and RAG capabilities**
+
 As such the design criteria for the docker image was:
 1) install a latest generation OWUI version
 2) install a latest generation ollama server
