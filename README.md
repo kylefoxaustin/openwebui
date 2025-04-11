@@ -1,13 +1,13 @@
 Welcome to the OpenWebUI Container!
 
-**The purpose of this container is simple: Provide a full featured OWUI container with full internet access and RAG capabilities**
+**The purpose of this container set is simple: Provide a full featured OWUI container with full internet access and RAG capabilities**
 
 As such the design criteria for the docker image was:
 1) install a latest generation OWUI version
 2) install a latest generation ollama server
 3) open an IP pipe for a local browser to access the OWUI server
 4) allow user to use 100% of the OWUI capabilities (pull new models, create new models, create knowledge (RAG) bases, create custom LLMs with knowledge base (RAG) attached
-
+5) Create two container types (tags) CPU-only and GPU-only:  This applies to ollama and where it runs its models.  Nvidia is the GPU (have not tested on AMD GPUs) 
 I have tried to make the image size as small as possible.  When pulled from docker.hub its ~4GB compressed.  When locally pulled it expands to ~8GB.
 This is before you pull a model or add a RAG.  I am working on ways to reduce the size however ollama itself is quite large so i may not pull this size down
 much more.
