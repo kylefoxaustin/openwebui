@@ -1,42 +1,68 @@
 # OpenWebUI with GPU-Accelerated Ollama
 
-This repository contains Docker Compose configuration to run [OpenWebUI](https://github.com/open-webui/open-webui) with GPU-accelerated [Ollama](https://github.com/ollama/ollama) for faster inference on local large language models.
+This repository provides Docker configurations to run [OpenWebUI](https://github.com/open-webui/open-webui) with [Ollama](https://github.com/ollama/ollama), optionally accelerated by NVIDIA GPUs for faster inference on local large language models.
 
 ## Overview
 
 This setup provides:
 - Web interface for interacting with large language models (LLMs)
-- GPU acceleration for faster model inference
+- GPU acceleration for faster model inference (when available)
 - Persistent storage for models and conversation history
 - Containerized environment for easy deployment and management
 
-## Prerequisites
+## Quick Start (Recommended)
+
+The default configuration automatically detects if you have an NVIDIA GPU with the required drivers and uses it. Otherwise, it falls back to CPU.
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/openwebui-gpu.git
+cd openwebui-gpu
+
+# Start the containers
+docker compose up -d
+
+# Access the web interface
+# http://localhost:8080
+```
+
+That's it! For most users, this is all you need to do.
+
+## Detailed Setup Instructions
 
 ### System Requirements
 
-- Ubuntu 22.04 or another Linux distribution with Docker support
+#### For All Systems
 - Docker Engine (version 20.10.0 or higher)
 - Docker Compose (version 2.0.0 or higher)
-- NVIDIA GPU (optional, for GPU acceleration)
+- 8GB+ RAM recommended (16GB+ for larger models)
+- 20GB+ free disk space for models
 
-### For GPU Acceleration
-
+#### For GPU Acceleration (Optional)
 - NVIDIA GPU with CUDA support
 - NVIDIA Driver (version 470.xx or higher)
 - NVIDIA Container Toolkit (nvidia-docker2)
 
-### Setting up NVIDIA Container Toolkit (for GPU acceleration)
+### Installation Options
+
+This repository offers three ways to deploy:
+
+1. **Quick Start** (`docker-compose.yml`) - Uses official images with automatic GPU detection
+2. **CPU-Only** (`docker-compose-cpu.yml`) - Explicitly uses CPU-only configuration
+3. **Custom Build** - Builds containers from Dockerfiles for CPU (`Dockerfile.cpu`) or GPU (`Dockerfile.gpu`)
+
+### Setup for GPU Acceleration
 
 If you have an NVIDIA GPU and want to use it for acceleration, you'll need to install the NVIDIA Container Toolkit:
 
 ```bash
-# Set up the package repository and GPG key using newer method
+# Set up the package repository and GPG key
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
 
 # Create directory for keyrings if it doesn't exist
 sudo mkdir -p /etc/apt/keyrings
 
-# Download and install the GPG key to the keyrings directory
+# Download and install the GPG key
 curl -fsSL https://nvidia.github.io/nvidia-docker/gpgkey | sudo gpg --dearmor -o /etc/apt/keyrings/nvidia-docker.gpg
 
 # Add the repository
@@ -65,64 +91,32 @@ sudo docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
 
 If the above command shows your GPU information, the toolkit is properly set up.
 
-## Installation
+### Deployment Options
 
-### Step 1: Clone the repository
+#### 1. Using Official Images (Recommended)
 
+This approach pulls pre-built images and is the quickest way to get started.
+
+**Default configuration** (Auto-detects GPU):
 ```bash
-git clone https://github.com/yourusername/openwebui-gpu.git
-cd openwebui-gpu
-```
-
-This repository provides two deployment options:
-
-1. **Using official images** - Quick and easy setup using pre-built images
-2. **Custom build** - Building your own containers from the provided Dockerfiles
-
-### Step 2: Choose the right configuration
-
-This repository is designed to be flexible, supporting both GPU-accelerated and CPU-only deployments:
-
-#### Option 1: Using docker-compose.yml (Recommended)
-
-The main `docker-compose.yml` file is designed to be universal:
-- On systems with NVIDIA GPU + Container Toolkit: It will automatically use GPU acceleration
-- On systems without GPU or Container Toolkit: It will automatically fall back to CPU-only operation
-
-This means most users can simply use the default configuration without modifications.
-
-#### Option 2: Custom Build with Dockerfile
-
-For users who want to build a custom container:
-- `Dockerfile.cpu` - Creates a CPU-only version (works on all systems)
-- `Dockerfile.gpu` - Creates a GPU-enabled version (requires NVIDIA GPU)
-
-To build using the Dockerfile approach:
-```bash
-# For CPU-only build
-docker compose -f docker-compose-custom-cpu.yml up -d --build
-
-# For GPU-enabled build
-docker compose -f docker-compose-custom-gpu.yml up -d --build
-```
-
-### Step 3: Start the containers
-
-#### Option 1: Using official images (recommended for most users)
-
-```bash
-# Start with default configuration (automatically detects GPU if available)
 docker compose up -d
 ```
 
-#### Option 2: Custom build
+**CPU-only configuration**:
+```bash
+docker compose -f docker-compose-cpu.yml up -d
+```
 
-For CPU-only systems:
+#### 2. Custom Build
+
+This approach builds the containers from Dockerfiles, giving you more control but taking longer.
+
+**For CPU-only systems**:
 ```bash
 docker compose -f docker-compose-custom-cpu.yml up -d --build
 ```
 
-For systems with NVIDIA GPU:
+**For systems with NVIDIA GPU**:
 ```bash
 docker compose -f docker-compose-custom-gpu.yml up -d --build
 ```
@@ -158,6 +152,14 @@ nvidia-smi
 
 You should see the Ollama process in the list, confirming GPU usage.
 
+For a more dynamic view, you can run:
+
+```bash
+watch -n 1 nvidia-smi
+```
+
+This will update the display every second, allowing you to observe GPU utilization in real-time while you interact with the model.
+
 ## Configuration
 
 ### Port Configuration
@@ -167,7 +169,7 @@ By default, the services use the following ports:
 - `8080`: OpenWebUI interface
 - `11436`: Ollama API (changed from the default 11434 to avoid conflicts with locally installed Ollama)
 
-If you need to change these ports, modify the `docker-compose.yml` file.
+If you need to change these ports, modify the appropriate docker-compose.yml file.
 
 ### Persistent Storage
 
@@ -200,7 +202,7 @@ docker logs -f ollama
 
 #### Port Conflicts
 
-If you see an error like "port is already allocated", it means another service is using the same port. Edit the `docker-compose.yml` file to use a different port.
+If you see an error like "port is already allocated", it means another service is using the same port. Edit the docker-compose.yml file to use a different port.
 
 #### GPU Not Being Used
 
@@ -209,6 +211,18 @@ If the GPU is not being used:
 1. Verify NVIDIA Container Toolkit is installed correctly
 2. Ensure your GPU is supported and drivers are installed
 3. Check Ollama logs for any error messages
+
+#### Models Running Slowly
+
+- If using GPU, check that your GPU is properly detected with `nvidia-smi`
+- Ensure you have enough system memory (16GB+ recommended for larger models)
+- Try a smaller model that better fits your hardware capabilities
+
+#### Cannot Access Web Interface
+
+- Check if the containers are running with `docker ps`
+- Verify port 8080 is not being used by another application
+- Check container logs for any startup errors
 
 ## Additional Commands
 
@@ -233,38 +247,19 @@ docker compose down -v
 
 ## Compatibility
 
-### Deployment Options
+### Hardware Support
 
-This repository provides two deployment approaches with different benefits:
+This project has been tested with:
 
-1. **Official Images** (`docker-compose.yml`):
-   - Quick to deploy
-   - Automatically uses GPU if available
-   - Falls back to CPU if no GPU is detected
-   - Easier to update
+- **CPUs**: Intel and AMD x86_64 processors
+- **GPUs**: NVIDIA Quadro RTX 8000, RTX series, and Tesla series
 
-2. **Custom Builds** (`Dockerfile.cpu` and `Dockerfile.gpu`):
-   - More control over the build process
-   - Can be optimized for specific hardware
-   - Suitable for specialized environments
-   - Allows for customization of the builds
+### Operating Systems
 
-### Tested Hardware
-
-#### GPUs
-- NVIDIA GeForce RTX Series
-- NVIDIA Quadro RTX Series (specifically tested with Quadro RTX 8000)
-- NVIDIA Tesla Series
-
-#### CPU Architectures
-- AMD64/x86_64 (Intel/AMD processors)
-
-### CPU-Only Mode
-
-If you don't have a compatible GPU or if you choose the CPU-only configuration, the setup will still work but model inference will be slower. This is ideal for:
-- Development environments
-- Systems without NVIDIA GPUs
-- Testing before deploying to GPU-enabled systems
+- Ubuntu 22.04 LTS (primary test platform)
+- Other Linux distributions with Docker support
+- Windows with WSL2 and Docker Desktop
+- macOS with Docker Desktop
 
 ## License
 
