@@ -64,11 +64,11 @@ That's it! For most users, this is all you need to do.
 
 ### Installation Options
 
-This repository offers three ways to deploy:
+This repository offers three deployment options:
 
-1. **Quick Start** (`docker-compose.yml`) - Uses official pre-built images with automatic GPU detection (no Dockerfile needed)
-2. **CPU-Only** (`docker-compose-cpu.yml`) - Explicitly uses CPU-only configuration with official images (no Dockerfile needed)
-3. **Custom Build** - Builds containers from Dockerfiles for CPU (`Dockerfile.cpu`) or GPU (`Dockerfile.gpu`)
+1. **Option 1: Quick Start** (`docker-compose.yml`) - Uses official pre-built images with automatic GPU detection (no Dockerfile needed)
+2. **Option 2: CPU-Only** (`docker-compose-cpu.yml`) - Explicitly uses CPU-only configuration with official images (no Dockerfile needed)
+3. **Option 3: Custom Build** - Builds containers from Dockerfiles for CPU (`Dockerfile.cpu`) or GPU (`Dockerfile.gpu`)
 
 ### Setup for GPU Acceleration on Linux
 
@@ -110,6 +110,42 @@ sudo docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
 
 If the above command shows your GPU information, the toolkit is properly set up.
 
+### Deployment Options
+
+#### Option 1: Quick Start with Official Images (Recommended)
+
+This approach pulls pre-built images directly from their repositories and is the quickest way to get started. No Dockerfiles are needed for this method.
+
+```bash
+# Auto-detects GPU if available, otherwise uses CPU
+docker compose -f Docker_Compose/docker-compose.yml up -d
+```
+
+#### Option 2: CPU-Only with Official Images
+
+Use this option if you specifically want to ensure only CPU is used, even if you have a GPU available.
+
+```bash
+# Explicitly uses CPU-only configuration
+docker compose -f Docker_Compose/docker-compose-cpu.yml up -d
+```
+
+#### Option 3: Custom Build
+
+This approach builds the containers from the provided Dockerfiles, giving you more control but taking longer.
+
+For CPU-only systems:
+```bash
+# Builds and runs a custom CPU-only container
+docker compose -f Docker_Compose/docker-compose-custom-cpu.yml up -d --build
+```
+
+For systems with NVIDIA GPU:
+```bash
+# Builds and runs a custom GPU-enabled container
+docker compose -f Docker_Compose/docker-compose-custom-gpu.yml up -d --build
+```
+
 ### Windows Installation
 
 This setup can run on Windows through Docker Desktop, with some specific considerations:
@@ -150,36 +186,6 @@ docker compose -f Docker_Compose\docker-compose.yml up -d  # in PowerShell
 ```
 
 **Note:** GPU acceleration on Windows requires more configuration than on Linux and may have some performance differences. For best performance with GPU acceleration, a Linux environment is recommended.
-
-### Deployment Options
-
-#### 1. Using Official Images (Recommended)
-
-This approach pulls pre-built images directly from their repositories and is the quickest way to get started. No Dockerfiles are needed for this method.
-
-**Default configuration** (Auto-detects GPU):
-```bash
-docker compose -f Docker_Compose/docker-compose.yml up -d
-```
-
-**CPU-only configuration**:
-```bash
-docker compose -f Docker_Compose/docker-compose-cpu.yml up -d
-```
-
-#### 2. Custom Build
-
-This approach builds the containers from the provided Dockerfiles, giving you more control but taking longer.
-
-**For CPU-only systems**:
-```bash
-docker compose -f Docker_Compose/docker-compose-custom-cpu.yml up -d --build
-```
-
-**For systems with NVIDIA GPU**:
-```bash
-docker compose -f Docker_Compose/docker-compose-custom-gpu.yml up -d --build
-```
 
 ## Building and Pushing Docker Images
 
