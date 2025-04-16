@@ -376,5 +376,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [OpenWebUI](https://github.com/open-webui/open-webui) for the web interface
 - [Ollama](https://github.com/ollama/ollama) for the model inference server
 - [NVIDIA](https://github.com/NVIDIA/nvidia-docker) for the Container Toolkit
-
-- 
