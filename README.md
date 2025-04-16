@@ -1,3 +1,17 @@
+# OpenWebUI with GPU-Accelerated Ollama
+
+This repository provides Docker configurations to run [OpenWebUI](https://github.com/open-webui/open-webui) with [Ollama](https://github.com/ollama/ollama), optionally accelerated by NVIDIA GPUs for faster inference on local large language models.
+
+## Overview
+
+This setup provides:
+* OpenWeb UI browser interface locally for your PC to interacting with large language models (LLMs)
+* Instantiates a full Ollama engine in the container (again local)
+* GPU acceleration for faster model inference (when available)
+* Persistent storage for models and conversation history
+* Containerized environment for easy deployment and management
+* Goal is for the user to pull this image to any AMD64 based PC running docker for a full OWUI+Ollama experience
+
 ## Repository Structure
 
 ```
@@ -13,19 +27,7 @@ openwebui/
 └── README.md                           # Documentation
 ```
 
-The main docker-compose files (docker-compose.yml and docker-compose-cpu.yml) pull pre-built images directly from their official repositories, so no Dockerfiles are required for these methods. The Dockerfiles are only used with the custom build options.# OpenWebUI with GPU-Accelerated Ollama
-
-This repository provides Docker configurations to run [OpenWebUI](https://github.com/open-webui/open-webui) with [Ollama](https://github.com/ollama/ollama), optionally accelerated by NVIDIA GPUs for faster inference on local large language models.
-
-## Overview
-
-This setup provides:
-- OpenWeb UI browser interface locally for your PC to interacting with large language models (LLMs)
-- instantiates a full Ollama engine in the container (again local)
-- GPU acceleration for faster model inference (when available)
-- Persistent storage for models and conversation history
-- Containerized environment for easy deployment and management
-- goal is for the user to pull this image to any AMD64 based PC running docker for a full OWUI+Ollama experience
+The main docker-compose files (docker-compose.yml and docker-compose-cpu.yml) pull pre-built images directly from their official repositories, so no Dockerfiles are required for these methods. The Dockerfiles are only used with the custom build options.
 
 ## Quick Start (Recommended)
 
@@ -33,11 +35,11 @@ The default configuration automatically detects if you have an NVIDIA GPU with t
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/openwebui-gpu.git
-cd openwebui-gpu
+git clone https://github.com/kylefoxaustin/openwebui.git
+cd openwebui
 
 # Start the containers
-docker compose up -d
+docker compose -f "Docker Compose/docker-compose.yml" up -d
 
 # Access the web interface
 # http://localhost:8080
@@ -68,7 +70,7 @@ This repository offers three ways to deploy:
 2. **CPU-Only** (`docker-compose-cpu.yml`) - Explicitly uses CPU-only configuration with official images (no Dockerfile needed)
 3. **Custom Build** - Builds containers from Dockerfiles for CPU (`Dockerfile.cpu`) or GPU (`Dockerfile.gpu`)
 
-### Setup for GPU Acceleration
+### Setup for GPU Acceleration on Linux
 
 If you have an NVIDIA GPU and want to use it for acceleration, you'll need to install the NVIDIA Container Toolkit:
 
@@ -107,6 +109,47 @@ sudo docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
 ```
 
 If the above command shows your GPU information, the toolkit is properly set up.
+
+### Windows Installation
+
+This setup can run on Windows through Docker Desktop, with some specific considerations:
+
+#### For Windows with CPU-only mode:
+
+1. Install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
+2. Ensure WSL2 (Windows Subsystem for Linux) is enabled and configured as the default engine for Docker Desktop
+3. In PowerShell or Command Prompt:
+
+```powershell
+# Clone the repository
+git clone https://github.com/kylefoxaustin/openwebui.git
+cd openwebui
+
+# Start the containers (note the path format for Windows)
+docker compose -f "Docker Compose\docker-compose.yml" up -d
+```
+
+#### For Windows with NVIDIA GPU acceleration:
+
+1. Install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
+2. Install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install)
+3. Install the [NVIDIA CUDA drivers for Windows](https://developer.nvidia.com/cuda-downloads)
+4. Install the latest [NVIDIA Container Toolkit for WSL2](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)
+5. Ensure Docker Desktop is configured to use WSL2
+6. In PowerShell or from the Ubuntu WSL2 terminal:
+
+```bash
+# Clone the repository
+git clone https://github.com/kylefoxaustin/openwebui.git
+cd openwebui
+
+# Start the containers
+docker compose -f "Docker Compose/docker-compose.yml" up -d  # in WSL2 bash
+# or
+docker compose -f "Docker Compose\docker-compose.yml" up -d  # in PowerShell
+```
+
+**Note:** GPU acceleration on Windows requires more configuration than on Linux and may have some performance differences. For best performance with GPU acceleration, a Linux environment is recommended.
 
 ### Deployment Options
 
@@ -164,7 +207,7 @@ To verify that GPU acceleration is working:
 2. While the model is generating a response, run this command:
 
 ```bash
-nvidia-smi
+nvidia-smi  # Linux or WSL2
 ```
 
 You should see the Ollama process in the list, confirming GPU usage.
@@ -172,10 +215,10 @@ You should see the Ollama process in the list, confirming GPU usage.
 For a more dynamic view, you can run:
 
 ```bash
-watch -n 1 nvidia-smi
+watch -n 1 nvidia-smi  # Linux or WSL2
 ```
 
-This will update the display every second, allowing you to observe GPU utilization in real-time while you interact with the model.
+On Windows without WSL2 access, you can check GPU usage through the Task Manager's Performance tab.
 
 ## Configuration
 
@@ -229,6 +272,12 @@ If the GPU is not being used:
 2. Ensure your GPU is supported and drivers are installed
 3. Check Ollama logs for any error messages
 
+#### Windows-Specific Issues
+
+1. **WSL2 Not Enabled**: Ensure WSL2 is properly enabled and Docker Desktop is configured to use it
+2. **Path Format Issues**: Windows uses backslashes (`\`) in paths, while Linux/WSL2 uses forward slashes (`/`)
+3. **GPU Passthrough Problems**: GPU passthrough to WSL2 requires specific drivers and configuration
+
 #### Models Running Slowly
 
 - If using GPU, check that your GPU is properly detected with `nvidia-smi`
@@ -276,8 +325,8 @@ This project has been tested with:
 
 - Ubuntu 22.04 LTS (primary test platform)
 - Other Linux distributions with Docker support
-- Windows with WSL2 and Docker Desktop
-- macOS with Docker Desktop
+- Windows 10/11 with WSL2 and Docker Desktop
+- macOS with Docker Desktop (CPU-only)
 
 ## License
 
