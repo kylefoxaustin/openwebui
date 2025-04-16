@@ -2,8 +2,6 @@
 
 This repository provides Docker configurations to run [OpenWebUI](https://github.com/open-webui/open-webui) with [Ollama](https://github.com/ollama/ollama), optionally accelerated by NVIDIA GPUs for faster inference on local large language models.
 
-You can find the prebuilt containers here: https://hub.docker.com/repository/docker/kylefoxaustin/openwebui/general
-
 ## Overview
 
 This setup provides:
@@ -18,7 +16,7 @@ This setup provides:
 
 ```
 openwebui/
-├── Docker Compose/
+├── Docker_Compose/
 │   ├── docker-compose.yml              # Main file (uses official images, no Dockerfile needed)
 │   ├── docker-compose-cpu.yml          # CPU-only version (uses official images, no Dockerfile needed)
 │   ├── docker-compose-custom-cpu.yml   # Custom CPU build (uses Dockerfile.cpu)
@@ -41,7 +39,7 @@ git clone https://github.com/kylefoxaustin/openwebui.git
 cd openwebui
 
 # Start the containers
-docker compose -f "Docker Compose/docker-compose.yml" up -d
+docker compose -f Docker_Compose/docker-compose.yml up -d
 
 # Access the web interface
 # http://localhost:8080
@@ -128,7 +126,7 @@ git clone https://github.com/kylefoxaustin/openwebui.git
 cd openwebui
 
 # Start the containers (note the path format for Windows)
-docker compose -f "Docker Compose\docker-compose.yml" up -d
+docker compose -f Docker_Compose\docker-compose.yml up -d
 ```
 
 #### For Windows with NVIDIA GPU acceleration:
@@ -146,9 +144,9 @@ git clone https://github.com/kylefoxaustin/openwebui.git
 cd openwebui
 
 # Start the containers
-docker compose -f "Docker Compose/docker-compose.yml" up -d  # in WSL2 bash
+docker compose -f Docker_Compose/docker-compose.yml up -d  # in WSL2 bash
 # or
-docker compose -f "Docker Compose\docker-compose.yml" up -d  # in PowerShell
+docker compose -f Docker_Compose\docker-compose.yml up -d  # in PowerShell
 ```
 
 **Note:** GPU acceleration on Windows requires more configuration than on Linux and may have some performance differences. For best performance with GPU acceleration, a Linux environment is recommended.
@@ -161,12 +159,12 @@ This approach pulls pre-built images directly from their repositories and is the
 
 **Default configuration** (Auto-detects GPU):
 ```bash
-docker compose -f "Docker Compose/docker-compose.yml" up -d
+docker compose -f Docker_Compose/docker-compose.yml up -d
 ```
 
 **CPU-only configuration**:
 ```bash
-docker compose -f "Docker Compose/docker-compose-cpu.yml" up -d
+docker compose -f Docker_Compose/docker-compose-cpu.yml up -d
 ```
 
 #### 2. Custom Build
@@ -175,12 +173,43 @@ This approach builds the containers from the provided Dockerfiles, giving you mo
 
 **For CPU-only systems**:
 ```bash
-docker compose -f "Docker Compose/docker-compose-custom-cpu.yml" up -d --build
+docker compose -f Docker_Compose/docker-compose-custom-cpu.yml up -d --build
 ```
 
 **For systems with NVIDIA GPU**:
 ```bash
-docker compose -f "Docker Compose/docker-compose-custom-gpu.yml" up -d --build
+docker compose -f Docker_Compose/docker-compose-custom-gpu.yml up -d --build
+```
+
+## Building and Pushing Docker Images
+
+If you want to build and push these images to your own Docker Hub repository:
+
+```bash
+# Clone the repository
+git clone https://github.com/kylefoxaustin/openwebui.git
+cd openwebui
+
+# Login to Docker Hub
+docker login
+
+# Build CPU-only image
+docker build -f Dockerfiles/Dockerfile.cpu -t yourusername/openwebui:cpu-only Dockerfiles
+
+# Build GPU-enabled image
+docker build -f Dockerfiles/Dockerfile.gpu -t yourusername/openwebui:gpu-cpu Dockerfiles
+
+# Tag the GPU image as generic
+docker tag yourusername/openwebui:gpu-cpu yourusername/openwebui:generic
+
+# Push all images to Docker Hub
+docker push yourusername/openwebui:cpu-only
+docker push yourusername/openwebui:gpu-cpu
+docker push yourusername/openwebui:generic
+
+# Also push a latest tag
+docker tag yourusername/openwebui:generic yourusername/openwebui:latest
+docker push yourusername/openwebui:latest
 ```
 
 ## Usage
@@ -297,21 +326,21 @@ If the GPU is not being used:
 ### Stopping the Containers
 
 ```bash
-docker compose -f "Docker Compose/docker-compose.yml" down
+docker compose -f Docker_Compose/docker-compose.yml down
 ```
 
 ### Updating the Containers
 
 ```bash
 cd openwebui
-docker compose -f "Docker Compose/docker-compose.yml" pull
-docker compose -f "Docker Compose/docker-compose.yml" up -d
+docker compose -f Docker_Compose/docker-compose.yml pull
+docker compose -f Docker_Compose/docker-compose.yml up -d
 ```
 
 ### Removing Volumes (Caution: This will delete all models and data)
 
 ```bash
-docker compose -f "Docker Compose/docker-compose.yml" down -v
+docker compose -f Docker_Compose/docker-compose.yml down -v
 ```
 
 ## Compatibility
@@ -339,3 +368,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [OpenWebUI](https://github.com/open-webui/open-webui) for the web interface
 - [Ollama](https://github.com/ollama/ollama) for the model inference server
 - [NVIDIA](https://github.com/NVIDIA/nvidia-docker) for the Container Toolkit
+
+- 
