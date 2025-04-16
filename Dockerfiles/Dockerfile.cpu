@@ -1,5 +1,5 @@
 # Stage 1: Build the frontend
-FROM node:20-slim as frontend-builder
+FROM node:20-slim AS frontend-builder
 WORKDIR /app
 
 # Clone OpenWebUI repository
@@ -85,4 +85,3 @@ VOLUME /root/.ollama
 VOLUME /app/backend/data
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
