@@ -3,10 +3,10 @@ services:
     build:
       context: ../Dockerfiles
       dockerfile: Dockerfile.cpu
-    image: owui-custom:cpu
+    image: kylefoxaustin/openwebui:cpu-only
     container_name: owui-cpu
     ports:
-      - "8080:8080"
+      - "8080:8080" 
       - "11436:11434"  # Map container's 11434 to host's 11436
     volumes:
       - ollama_data:/root/.ollama
@@ -18,4 +18,4 @@ services:
 volumes:
   ollama_data:
   openwebui_data:
-
+  
