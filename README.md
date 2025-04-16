@@ -20,10 +20,12 @@ This repository provides Docker configurations to run [OpenWebUI](https://github
 ## Overview
 
 This setup provides:
-- Web interface for interacting with large language models (LLMs)
+- OpenWeb UI browser interface locally for your PC to interacting with large language models (LLMs)
+- instantiates a full Ollama engine in the container (again local)
 - GPU acceleration for faster model inference (when available)
 - Persistent storage for models and conversation history
 - Containerized environment for easy deployment and management
+- goal is for the user to pull this image to any AMD64 based PC running docker for a full OWUI+Ollama experience
 
 ## Quick Start (Recommended)
 
