@@ -1,7 +1,7 @@
 services:
   owui:
     build:
-      context: .
+      context: ../Dockerfiles
       dockerfile: Dockerfile.cpu
     image: owui-custom:cpu
     container_name: owui-cpu
@@ -19,4 +19,3 @@ volumes:
   ollama_data:
   openwebui_data:
 
- 
