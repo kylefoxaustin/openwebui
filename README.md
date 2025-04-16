@@ -1,4 +1,19 @@
-# OpenWebUI with GPU-Accelerated Ollama
+## Repository Structure
+
+```
+openwebui/
+├── Docker Compose/
+│   ├── docker-compose.yml              # Main file (uses official images, no Dockerfile needed)
+│   ├── docker-compose-cpu.yml          # CPU-only version (uses official images, no Dockerfile needed)
+│   ├── docker-compose-custom-cpu.yml   # Custom CPU build (uses Dockerfile.cpu)
+│   └── docker-compose-custom-gpu.yml   # Custom GPU build (uses Dockerfile.gpu)
+├── Dockerfiles/
+│   ├── Dockerfile.cpu                  # For custom CPU builds only
+│   └── Dockerfile.gpu                  # For custom GPU builds only
+└── README.md                           # Documentation
+```
+
+The main docker-compose files (docker-compose.yml and docker-compose-cpu.yml) pull pre-built images directly from their official repositories, so no Dockerfiles are required for these methods. The Dockerfiles are only used with the custom build options.# OpenWebUI with GPU-Accelerated Ollama
 
 This repository provides Docker configurations to run [OpenWebUI](https://github.com/open-webui/open-webui) with [Ollama](https://github.com/ollama/ollama), optionally accelerated by NVIDIA GPUs for faster inference on local large language models.
 
@@ -47,8 +62,8 @@ That's it! For most users, this is all you need to do.
 
 This repository offers three ways to deploy:
 
-1. **Quick Start** (`docker-compose.yml`) - Uses official images with automatic GPU detection
-2. **CPU-Only** (`docker-compose-cpu.yml`) - Explicitly uses CPU-only configuration
+1. **Quick Start** (`docker-compose.yml`) - Uses official pre-built images with automatic GPU detection (no Dockerfile needed)
+2. **CPU-Only** (`docker-compose-cpu.yml`) - Explicitly uses CPU-only configuration with official images (no Dockerfile needed)
 3. **Custom Build** - Builds containers from Dockerfiles for CPU (`Dockerfile.cpu`) or GPU (`Dockerfile.gpu`)
 
 ### Setup for GPU Acceleration
@@ -95,30 +110,30 @@ If the above command shows your GPU information, the toolkit is properly set up.
 
 #### 1. Using Official Images (Recommended)
 
-This approach pulls pre-built images and is the quickest way to get started.
+This approach pulls pre-built images directly from their repositories and is the quickest way to get started. No Dockerfiles are needed for this method.
 
 **Default configuration** (Auto-detects GPU):
 ```bash
-docker compose up -d
+docker compose -f "Docker Compose/docker-compose.yml" up -d
 ```
 
 **CPU-only configuration**:
 ```bash
-docker compose -f docker-compose-cpu.yml up -d
+docker compose -f "Docker Compose/docker-compose-cpu.yml" up -d
 ```
 
 #### 2. Custom Build
 
-This approach builds the containers from Dockerfiles, giving you more control but taking longer.
+This approach builds the containers from the provided Dockerfiles, giving you more control but taking longer.
 
 **For CPU-only systems**:
 ```bash
-docker compose -f docker-compose-custom-cpu.yml up -d --build
+docker compose -f "Docker Compose/docker-compose-custom-cpu.yml" up -d --build
 ```
 
 **For systems with NVIDIA GPU**:
 ```bash
-docker compose -f docker-compose-custom-gpu.yml up -d --build
+docker compose -f "Docker Compose/docker-compose-custom-gpu.yml" up -d --build
 ```
 
 ## Usage
@@ -229,20 +244,21 @@ If the GPU is not being used:
 ### Stopping the Containers
 
 ```bash
-docker compose down
+docker compose -f "Docker Compose/docker-compose.yml" down
 ```
 
 ### Updating the Containers
 
 ```bash
-docker compose pull
-docker compose up -d
+cd openwebui
+docker compose -f "Docker Compose/docker-compose.yml" pull
+docker compose -f "Docker Compose/docker-compose.yml" up -d
 ```
 
 ### Removing Volumes (Caution: This will delete all models and data)
 
 ```bash
-docker compose down -v
+docker compose -f "Docker Compose/docker-compose.yml" down -v
 ```
 
 ## Compatibility
@@ -270,5 +286,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [OpenWebUI](https://github.com/open-webui/open-webui) for the web interface
 - [Ollama](https://github.com/ollama/ollama) for the model inference server
 - [NVIDIA](https://github.com/NVIDIA/nvidia-docker) for the Container Toolkit
-
-- 
