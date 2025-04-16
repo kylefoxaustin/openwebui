@@ -2,6 +2,8 @@
 
 This repository provides Docker configurations to run [OpenWebUI](https://github.com/open-webui/open-webui) with [Ollama](https://github.com/ollama/ollama), optionally accelerated by NVIDIA GPUs for faster inference on local large language models.
 
+You can find the prebuilt containers here: https://hub.docker.com/repository/docker/kylefoxaustin/openwebui/general
+
 ## Overview
 
 This setup provides:
