@@ -19,3 +19,4 @@ volumes:
   ollama_data:
   openwebui_data:
 
+ 
