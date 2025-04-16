@@ -32,6 +32,8 @@ The main docker-compose files (docker-compose.yml and docker-compose-cpu.yml) pu
 ## Quick Start (Recommended)
 
 The default configuration automatically detects if you have an NVIDIA GPU with the required drivers and uses it. Otherwise, it falls back to CPU.
+However this implies your host machine has installed the necessary NVIDIA GPU infrastructure (e.g. nvidia-smi, drivers, and nvidia build container). 
+Instructions for how to do this prestep is below under ### Setup for GPU Acceleration on Linux
 
 ```bash
 # Clone the repository
