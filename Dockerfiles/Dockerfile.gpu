@@ -103,4 +103,3 @@ VOLUME /root/.ollama
 VOLUME /app/backend/data
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
