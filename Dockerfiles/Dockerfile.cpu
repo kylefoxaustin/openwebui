@@ -11,7 +11,7 @@ RUN git clone --depth 1 https://github.com/open-webui/open-webui.git .
 # Build frontend
 RUN npm ci && npm run build
 
-# Stage 2: Final image
+# Stage 2: Final image with Python 3.11
 FROM python:3.11-slim
 WORKDIR /app
 
@@ -52,7 +52,8 @@ RUN mkdir -p /app/backend/data && chmod -R 777 /app/backend/data && \
 ENV OLLAMA_HOST="0.0.0.0" \
     PORT=8080 \
     HOST=0.0.0.0 \
-    OLLAMA_BASE_URL="http://localhost:11434"
+    OLLAMA_BASE_URL="http://localhost:11434" \
+    PYTHONPATH="${PYTHONPATH}:/app/backend"
 
 # Create log directory
 RUN mkdir -p /var/log/supervisor
@@ -85,3 +86,4 @@ VOLUME /root/.ollama
 VOLUME /app/backend/data
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
