@@ -15,6 +15,10 @@ RUN npm ci && npm run build
 FROM python:3.11-slim
 WORKDIR /app
 
+# Set environment variables for non-interactive apt installation
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=Etc/UTC
+
 # Install runtime dependencies with better error handling
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
@@ -29,6 +33,7 @@ RUN apt-get clean && \
     supervisor \
     bash \
     wget \
+    tzdata \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
